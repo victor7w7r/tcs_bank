@@ -8,6 +8,7 @@ import com.tcs.transactions.movimientos.repository.MovimientoRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

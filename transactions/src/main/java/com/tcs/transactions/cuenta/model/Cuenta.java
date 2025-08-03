@@ -28,6 +28,10 @@ public class Cuenta {
     @Column(unique = true)
     private Long clienteRef;
 
-    @OneToMany(mappedBy = "cuenta",  cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(
+            fetch = FetchType.EAGER,
+            mappedBy = "cuenta",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
     private List<Movimiento> movimientos;
 }

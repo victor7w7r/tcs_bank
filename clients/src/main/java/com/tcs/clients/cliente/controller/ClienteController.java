@@ -1,12 +1,14 @@
 package com.tcs.clients.cliente.controller;
 
 import com.tcs.clients.cliente.dto.ClienteDTO;
+import com.tcs.clients.cliente.dto.StatusAccountResDTO;
 import com.tcs.clients.cliente.service.ClienteService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 record StatusResponse(String status) {}
@@ -22,6 +24,19 @@ public class ClienteController {
     @GetMapping
     private ResponseEntity<List<ClienteDTO>> getAllClientes() {
         return ResponseEntity.ok(clienteService.getAllClientes());
+    }
+
+    @GetMapping("reportes")
+    private ResponseEntity<List<StatusAccountResDTO>> getEstadoCuenta(
+            @RequestParam LocalDate fechaInicio,
+            @RequestParam LocalDate fechaFin,
+            @RequestParam String identificacion
+    ) throws BadRequestException {
+        return ResponseEntity.ok(clienteService.requestEstadoCuenta(
+                fechaInicio,
+                fechaFin,
+                identificacion
+        ));
     }
 
     @PostMapping
