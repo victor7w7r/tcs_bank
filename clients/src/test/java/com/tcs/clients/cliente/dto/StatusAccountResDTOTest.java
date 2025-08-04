@@ -10,7 +10,9 @@ public class StatusAccountResDTOTest {
 
     @Test
     public void statusAccountResDTOTest_withValidProperties() {
-        final var fecha = LocalDate.now();
+        final var fecha = LocalDate.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        );
         final var cliente = "Victor";
         final var numCuenta = 1L;
         final var tipoCuenta = "Ahorro";

@@ -8,6 +8,6 @@ RUN gradle clean build -x test
 
 FROM docker.io/eclipse-temurin:24-jre-alpine
 WORKDIR /home/application/java
-COPY --from=compile "/home/source/java/build/libs/transactions-1.0.0.jar" .
+COPY --from=compile "/home/source/java/build/libs/clients-1.0.0.jar" .
 EXPOSE 8080
-ENTRYPOINT [ "java", "-jar", "/home/application/java/transactions-1.0.0.jar"]
+ENTRYPOINT [ "java", "-jar", "/home/application/java/clients-1.0.0.jar"]
