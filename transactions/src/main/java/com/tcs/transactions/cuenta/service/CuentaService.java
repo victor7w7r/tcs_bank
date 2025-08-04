@@ -10,6 +10,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,23 +30,32 @@ public class CuentaService {
   }
 
   @RabbitListener(queues = "account_status_queue")
-  public List<StatusAccountResDTO> requestEstadoCuenta(StatusAccountReqDTO req) {
+  public List<StatusAccountResDTO> requestEstadoCuenta(@Payload StatusAccountReqDTO req) {
     final var requestData = cuentaRepository.findAllByClienteRef(req.getClienteRef());
 
     final var response = new ArrayList<StatusAccountResDTO>();
 
     for (final var cuenta : requestData) {
       for (final var movimiento : cuenta.getMovimientos()) {
-        if (movimiento.getFecha().isAfter(req.getFechaInicio()) && movimiento.getFecha().isBefore(req.getFechaFin())) {
+        if ((
+                movimiento.getFecha().isAfter(req.getFechaInicio())
+                        || movimiento.getFecha().isEqual(req.getFechaInicio()))
+                && (movimiento.getFecha().isBefore(req.getFechaFin())
+                        || movimiento.getFecha().isEqual(req.getFechaFin())
+        )) {
+
+          final var saldoInicial = movimiento.getSaldo();
+          final var saldoDiff = saldoInicial.add(movimiento.getValor());
+
           final var statusAccount = StatusAccountResDTO.builder()
-                  .fecha(movimiento.getFecha())
+                  .fecha(movimiento.getFecha().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                   .cliente(req.getNombreCliente())
                   .numCuenta(cuenta.getNumCuenta())
                   .tipoCuenta(cuenta.getTipoCuenta())
                   .tipoMovimiento(movimiento.getTipoMovimiento())
                   .movimiento(movimiento.getValor())
                   .saldo(movimiento.getSaldo())
-                  .saldoDisponible(cuenta.getSaldoInicial())
+                  .saldoDisponible(saldoDiff)
                   .build();
           response.add(statusAccount);
         }
@@ -67,7 +77,7 @@ public class CuentaService {
     rabbitTemplate.setReplyTimeout(2000);
 
     final var clienteRef = (Long) rabbitTemplate.convertSendAndReceive(
-            "cilente_cuenta_queue", identificacion
+            "bank-tcs", "cliente.creado", identificacion
     );
 
     if (clienteRef == null) {

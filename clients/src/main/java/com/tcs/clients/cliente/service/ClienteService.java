@@ -32,7 +32,7 @@ public class ClienteService {
     return ClienteMapper.toDTOList(clienteRepository.findAll());
   }
 
-  @RabbitListener(queues = "cilente_cuenta_queue")
+  @RabbitListener(queues = "cliente-cuenta-queue")
   public Long envioClienteRef(String identificacion) {
     final var cliente = clienteRepository.findByIdentificacion(identificacion);
     return cliente.map(Persona::getId).orElse(null);
@@ -47,11 +47,10 @@ public class ClienteService {
     final var clienteFound = clienteRepository.findByIdentificacion(identificacion)
             .orElseThrow(() -> new BadRequestException("ERROR: Cliente no encontrado"));
 
-
-    rabbitTemplate.setReplyTimeout(5000);
+    rabbitTemplate.setReplyTimeout(8000);
 
     final var response = rabbitTemplate.convertSendAndReceive(
-            "account_status_queue", StatusAccountReqDTO.builder()
+            "bank-tcs", "cuenta.estado.solicitado",  StatusAccountReqDTO.builder()
                     .fechaInicio(fechaInicio)
                     .fechaFin(fechaFin)
                     .clienteRef(clienteFound.getId())
@@ -106,7 +105,7 @@ public class ClienteService {
     rabbitTemplate.setReplyTimeout(2000);
 
     final var response = (Long) rabbitTemplate.convertSendAndReceive(
-            "borrar_cliente", clienteFound.getId()
+            "cliente.borrado", clienteFound.getId()
     );
 
     if (response == null) {

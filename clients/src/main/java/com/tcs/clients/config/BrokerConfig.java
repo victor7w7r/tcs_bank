@@ -1,59 +1,88 @@
-package com.tcs.transactions.config;
+package com.tcs.clients.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class BrokerConfig {
 
-    @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(new Jackson2JsonMessageConverter());
-        return template;
-    }
+  public static final String EXCHANGE_NAME = "bank-tcs";
 
-    @Bean
-    public DirectExchange stdExchage() {
-        return new DirectExchange("bank.exchange");
-    }
+  public static final String CLIENTE_CUENTA_QUEUE = "cliente-cuenta-queue";
+  public static final String CLIENTE_CUENTA_ROUTING_KEY = "cliente.creado";
 
-    @Bean
-    public Queue clienteCuentaQueue() {
-        return new Queue("cilente_cuenta_queue");
-    }
+  public static final String BORRAR_CLIENTE_QUEUE = "borrar_cliente";
+  public static final String BORRAR_CLIENTE_ROUTING_KEY = "cliente.borrado";
 
-    @Bean
-    public Queue borrarClienteQueue() {
-        return new Queue("borrar_cliente");
-    }
+  public static final String ACCOUNT_STATUS_QUEUE = "account_status_queue";
+  public static final String ACCOUNT_STATUS_ROUTING_KEY = "cuenta.estado.solicitado";
 
-    @Bean
-    public Queue accountStatusQueue() {
-        return new Queue("account_status_queue");
-    }
+  @Bean
+  public DirectExchange exchange() {
+    return new DirectExchange(EXCHANGE_NAME);
+  }
 
-    @Bean
-    public Binding bindingClienteCuenta(Queue clienteCuentaQueue, DirectExchange stdExchage) {
-        return BindingBuilder.bind(clienteCuentaQueue).to(stdExchage).with("cliente.creado");
-    }
+  @Bean
+  public Queue clienteCuentaQueue() {
+    return new Queue(CLIENTE_CUENTA_QUEUE, true);
+  }
 
-    @Bean
-    public Binding bindingBorrarCliente(Queue borrarClienteQueue, DirectExchange stdExchage) {
-        return BindingBuilder.bind(borrarClienteQueue).to(stdExchage).with("cliente.borrado");
-    }
+  @Bean
+  public Queue borrarClienteQueue() {
+    return new Queue(BORRAR_CLIENTE_QUEUE, true);
+  }
 
-    @Bean
-    public Binding bindingAccountStatus(Queue accountStatusQueue, DirectExchange stdExchage) {
-        return BindingBuilder.bind(accountStatusQueue).to(stdExchage).with("cuenta.estado.solicitado");
-    }
+  @Bean
+  public Queue accountStatusQueue() {
+    return new Queue(ACCOUNT_STATUS_QUEUE, true);
+  }
+
+  @Bean
+  public Binding bindingClienteCuenta() {
+    return BindingBuilder.bind(clienteCuentaQueue()).to(exchange()).with(CLIENTE_CUENTA_ROUTING_KEY);
+  }
+
+  @Bean
+  public Binding bindingBorrarCliente() {
+    return BindingBuilder.bind(borrarClienteQueue()).to(exchange()).with(BORRAR_CLIENTE_ROUTING_KEY);
+  }
+
+  @Bean
+  public Binding bindingAccountStatus() {
+    return BindingBuilder.bind(accountStatusQueue()).to(exchange()).with(ACCOUNT_STATUS_ROUTING_KEY);
+  }
+
+  @Bean
+  public MessageConverter jsonConverter() {
+    final var converter = new Jackson2JsonMessageConverter();
+
+    Map<String, Class<?>> typeMappings = new HashMap<>();
+    typeMappings.put(
+            "com.tcs.transactions.cuenta.dto.StatusAccountResDTO",
+            com.tcs.clients.cliente.dto.StatusAccountResDTO.class
+    );
+
+    final var classMapper = new DefaultClassMapper();
+    classMapper.setIdClassMapping(typeMappings);
+    converter.setClassMapper(classMapper);
+    return converter;
+
+  }
+
+  @Bean
+  public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    final var template = new RabbitTemplate(connectionFactory);
+    template.setMessageConverter(jsonConverter());
+    return template;
+  }
+
 }
-
-

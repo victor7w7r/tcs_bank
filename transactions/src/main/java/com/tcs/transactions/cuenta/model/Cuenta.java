@@ -24,8 +24,6 @@ public class Cuenta {
     private String tipoCuenta;
     private BigDecimal saldoInicial;
     private Boolean estado;
-
-    @Column(unique = true)
     private Long clienteRef;
 
     @OneToMany(
