@@ -1,6 +1,9 @@
-package com.tcs.clients.infrastructure.config;
+package com.tcs.transactions.common.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
@@ -63,24 +66,12 @@ public class BrokerConfig {
 
   @Bean
   public MessageConverter jsonConverter() {
-    final var converter = new Jackson2JsonMessageConverter();
-
-    Map<String, Class<?>> typeMappings = new HashMap<>();
-    typeMappings.put(
-            "com.tcs.transactions.cuenta.infrastructure.in.messaging.entity.StatusAccountReceiveRes",
-            com.tcs.clients.domain.model.StatusAccountReceive.class
-    );
-
-    final var classMapper = new DefaultClassMapper();
-    classMapper.setIdClassMapping(typeMappings);
-    converter.setClassMapper(classMapper);
-    return converter;
-
+    return new Jackson2JsonMessageConverter();
   }
 
   @Bean
   public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-    final var template = new RabbitTemplate(connectionFactory);
+    RabbitTemplate template = new RabbitTemplate(connectionFactory);
     template.setMessageConverter(jsonConverter());
     return template;
   }

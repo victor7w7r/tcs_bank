@@ -1,6 +1,7 @@
-package com.tcs.clients.domain.model;
+package com.tcs.transactions.cuenta.domain.model;
 
 import lombok.*;
+
 import java.math.BigDecimal;
 
 @Builder

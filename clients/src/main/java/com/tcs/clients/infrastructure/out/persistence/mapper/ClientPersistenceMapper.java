@@ -14,7 +14,6 @@ public interface ClientPersistenceMapper {
 
   ClienteEntity toClienteEntity(Cliente cliente);
 
-  @Mapping(target = "id", ignore = true)
   Cliente toCliente(ClienteEntity entity);
   List<Cliente> toClienteList(List<ClienteEntity> entityList);
 
