@@ -3,22 +3,22 @@ package com.tcs.transactions.cuenta.controller;
 import com.tcs.transactions.cuenta.dto.CuentaDTO;
 import com.tcs.transactions.cuenta.service.CuentaService;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-record StatusResponse(String status) {
-}
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("cuentas")
 public class CuentaController {
 
-    @Autowired
-    private CuentaService cuentaService;
+    public CuentaController(CuentaService cuentaService) {
+        this.cuentaService = cuentaService;
+    }
+
+    private final CuentaService cuentaService;
 
     @GetMapping
     private ResponseEntity<List<CuentaDTO>> getAllCuentas() {
@@ -26,24 +26,24 @@ public class CuentaController {
     }
 
     @PostMapping("{identificacion}")
-    private ResponseEntity<?> saveCuenta(
+    private ResponseEntity<Map<String, String>> saveCuenta(
             @RequestBody CuentaDTO cuenta,
             @PathVariable String identificacion
     ) throws BadRequestException {
         cuentaService.saveCuenta(cuenta, identificacion);
-        return ResponseEntity.ok(new StatusResponse("Cuenta guardada exitosamente"));
+        return ResponseEntity.status(201).body(Map.of("status", "Cuenta guardada exitosamente"));
     }
 
     @PutMapping
-    private ResponseEntity<?> updateCuenta(@RequestBody CuentaDTO cuenta) throws BadRequestException {
+    private ResponseEntity<Map<String, String>> updateCuenta(@RequestBody CuentaDTO cuenta) {
         cuentaService.updateCuenta(cuenta);
-        return ResponseEntity.ok(new StatusResponse("Cuenta actualizada exitosamente"));
+        return ResponseEntity.status(202).body(Map.of("status", "Cuenta actualizada exitosamente"));
     }
 
     @DeleteMapping("{numCuenta}")
-    private ResponseEntity<?> deleteCuenta(@PathVariable Long numCuenta) throws BadRequestException {
+    private ResponseEntity<Map<String, String>> deleteCuenta(@PathVariable Long numCuenta) {
         cuentaService.deleteCuenta(numCuenta);
-        return ResponseEntity.ok(new StatusResponse("Cuenta eliminada exitosamente"));
+        return ResponseEntity.status(202).body(Map.of("status", "Cuenta eliminada exitosamente"));
     }
 
 }

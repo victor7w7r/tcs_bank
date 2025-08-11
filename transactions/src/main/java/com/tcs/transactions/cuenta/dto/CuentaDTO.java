@@ -7,9 +7,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Builder(toBuilder = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class CuentaDTO {
 
     @NonNull
@@ -20,6 +20,7 @@ public class CuentaDTO {
 
     @NonNull
     private BigDecimal saldoInicial;
+
     private Long clienteRef;
     private Boolean estado;
 

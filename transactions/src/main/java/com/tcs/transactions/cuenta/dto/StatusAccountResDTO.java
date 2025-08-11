@@ -4,17 +4,33 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-@Data
 @Builder(toBuilder = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatusAccountResDTO {
-    private String fecha;
-    private String cliente;
-    private Long numCuenta;
-    private String tipoCuenta;
-    private String tipoMovimiento;
-    private BigDecimal movimiento;
-    private BigDecimal saldo;
-    private BigDecimal saldoDisponible;
+
+  @NonNull
+  private String fecha;
+
+  @NonNull
+  private String cliente;
+
+  @NonNull
+  private Long numCuenta;
+
+  @NonNull
+  private String tipoCuenta;
+
+  @NonNull
+  private String tipoMovimiento;
+
+  @NonNull
+  private BigDecimal movimiento;
+
+  @NonNull
+  private BigDecimal saldo;
+
+  @NonNull
+  private BigDecimal saldoDisponible;
 }

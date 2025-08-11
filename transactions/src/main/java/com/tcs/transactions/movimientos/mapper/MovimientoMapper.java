@@ -1,38 +1,30 @@
 package com.tcs.transactions.movimientos.mapper;
 
+import com.tcs.transactions.cuenta.model.Cuenta;
 import com.tcs.transactions.movimientos.dto.MovimientoDTO;
 import com.tcs.transactions.movimientos.model.Movimiento;
-import lombok.Builder;
-import lombok.Data;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
-@Builder
-@Data
-public class MovimientoMapper {
+@Mapper(componentModel = "spring")
+public interface MovimientoMapper {
+    List<MovimientoDTO> toDTOList(List<Movimiento> movimientos);
+    MovimientoDTO map(Movimiento movimiento);
 
-    public static MovimientoDTO toDTO(Movimiento movimiento) {
-        return MovimientoDTO.builder()
-                .fecha(movimiento.getFecha())
-                .tipoMovimiento(movimiento.getTipoMovimiento())
-                .valor(movimiento.getValor())
-                .saldo(movimiento.getSaldo())
-                .uuid(movimiento.getUuid())
-                .build();
-    }
+    Movimiento toMovimiento(
+            LocalDate fecha,
+            String tipoMovimiento,
+            BigDecimal valor,
+            BigDecimal saldo,
+            String uuid,
+            Long cuentaId
+    );
 
-    public static List<MovimientoDTO> toDTOList(List<Movimiento> movimientos) {
-        return movimientos.stream().map(MovimientoMapper::toDTO).toList();
-    }
-
-    public static Movimiento toMovimiento(MovimientoDTO movimientoDTO) {
-        return Movimiento.builder()
-                .fecha(movimientoDTO.getFecha())
-                .tipoMovimiento(movimientoDTO.getTipoMovimiento())
-                .valor(movimientoDTO.getValor())
-                .saldo(movimientoDTO.getSaldo())
-                .uuid(movimientoDTO.getUuid())
-                .build();
-    }
-
+    @Mapping(target = "uuid", ignore = true)
+    void updateFromDto(MovimientoDTO source, @MappingTarget Movimiento target);
 }

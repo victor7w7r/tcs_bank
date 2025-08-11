@@ -10,8 +10,6 @@ import java.time.LocalDate;
 @Entity
 @Data
 @Builder(toBuilder = true)
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Movimiento {
@@ -27,7 +25,7 @@ public class Movimiento {
     private BigDecimal saldo;
     private String uuid;
 
-    @ManyToOne
-    @JoinColumn(name = "movimiento_cuenta")
-    private Cuenta cuenta;
+    @Column(name = "cuenta_id")
+    private Long cuentaId;
+
 }

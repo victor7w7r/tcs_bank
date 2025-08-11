@@ -17,4 +17,7 @@ public class MovimientoDTO {
     private BigDecimal valor;
     private BigDecimal saldo;
     private String uuid;
+
+    @NonNull
+    private String cuentaId;
 }

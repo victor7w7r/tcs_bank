@@ -4,13 +4,21 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatusAccountReqDTO {
+
+    @NonNull
     private LocalDate fechaInicio;
+
+    @NonNull
     private LocalDate fechaFin;
+
+    @NonNull
     private Long clienteRef;
+
+    @NonNull
     private String nombreCliente;
 }

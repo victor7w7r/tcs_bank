@@ -1,6 +1,8 @@
 package com.tcs.transactions.cuenta.repository;
 
 import com.tcs.transactions.cuenta.model.Cuenta;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

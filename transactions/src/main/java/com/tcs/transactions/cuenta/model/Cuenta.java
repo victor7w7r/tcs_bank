@@ -8,28 +8,26 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Builder(toBuilder = true)
 @Data
-@Getter
-@Setter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cuenta {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Long id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  private Long id;
 
-    @Column(unique = true)
-    private Long numCuenta;
-    private String tipoCuenta;
-    private BigDecimal saldoInicial;
-    private Boolean estado;
-    private Long clienteRef;
+  @Column(unique = true)
+  private Long numCuenta;
+  private String tipoCuenta;
+  private BigDecimal saldoInicial;
+  private Boolean estado;
+  private Long clienteRef;
 
-    @OneToMany(
-            fetch = FetchType.EAGER,
-            mappedBy = "cuenta",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true)
-    private List<Movimiento> movimientos;
+  @OneToMany(
+          fetch = FetchType.LAZY,
+          cascade = CascadeType.REMOVE,
+          orphanRemoval = true)
+  @JoinColumn(name = "cuenta_id")
+  private List<Movimiento> movimientos;
 }
